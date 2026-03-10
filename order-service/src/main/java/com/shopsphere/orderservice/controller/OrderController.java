@@ -1,0 +1,141 @@
+package com.shopsphere.orderservice.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
+
+import com.shopsphere.orderservice.entity.Order;
+import com.shopsphere.orderservice.entity.OrderItem;
+import com.shopsphere.orderservice.repository.OrderRepository;
+import com.shopsphere.orderservice.repository.OrderItemRepository;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/orders")
+@CrossOrigin("*")
+public class OrderController {
+
+    @Autowired
+    private OrderRepository orderRepository;
+
+    @Autowired
+    private OrderItemRepository orderItemRepository;
+
+    private RestTemplate restTemplate = new RestTemplate();
+
+    // ==========================
+    // PLACE ORDER
+    // ==========================
+    @PostMapping("/place/{userId}")
+    public Order placeOrder(@PathVariable Long userId,
+                            @RequestBody Order order) {
+
+        order.setUserId(userId);
+        order.setStatus("PLACED");
+
+        // Save order first
+        Order savedOrder = orderRepository.save(order);
+
+        // Fetch cart items from cart-service
+        List<Map<String, Object>> cartItems =
+                restTemplate.getForObject(
+                        "http://localhost:8083/cart/user/" + userId,
+                        List.class
+                );
+
+        double totalAmount = 0;
+        List<OrderItem> orderItems = new ArrayList<>();
+
+        if (cartItems != null) {
+
+            for (Map<String, Object> item : cartItems) {
+
+                OrderItem orderItem = new OrderItem();
+
+                orderItem.setOrderId(savedOrder.getId());
+
+                String productName = (String) item.get("productName");
+                double price = Double.parseDouble(item.get("price").toString());
+                int quantity = Integer.parseInt(item.get("quantity").toString());
+                String imageUrl = (String) item.get("imageUrl");
+
+                orderItem.setProductName(productName);
+                orderItem.setPrice(price);
+                orderItem.setQuantity(quantity);
+                orderItem.setImageUrl(imageUrl);
+
+                totalAmount += price * quantity;
+
+                orderItemRepository.save(orderItem);
+
+                orderItems.add(orderItem);
+            }
+        }
+
+        // Update total amount
+        savedOrder.setTotalAmount(totalAmount);
+        orderRepository.save(savedOrder);
+
+        return savedOrder;
+    }
+
+
+    // ==========================
+    // GET USER ORDERS
+    // ==========================
+    @GetMapping("/user/{userId}")
+    public List<Order> getOrdersByUser(@PathVariable Long userId) {
+
+        List<Order> orders = orderRepository.findByUserId(userId);
+
+        for (Order order : orders) {
+
+            List<OrderItem> items =
+                    orderItemRepository.findByOrderId(order.getId());
+
+            order.setItems(items);
+        }
+
+        return orders;
+    }
+
+
+    // ==========================
+    // ADMIN - GET ALL ORDERS
+    // ==========================
+    @GetMapping
+    public List<Order> getAllOrders() {
+
+        List<Order> orders = orderRepository.findAll();
+
+        for (Order order : orders) {
+
+            List<OrderItem> items =
+                    orderItemRepository.findByOrderId(order.getId());
+
+            order.setItems(items);
+        }
+
+        return orders;
+    }
+
+
+    // ==========================
+    // ADMIN - UPDATE ORDER STATUS
+    // ==========================
+    @PutMapping("/update-status/{orderId}")
+    public Order updateStatus(@PathVariable Long orderId,
+                              @RequestBody Map<String,String> body){
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        order.setStatus(body.get("status"));
+
+        return orderRepository.save(order);
+    }
+
+}

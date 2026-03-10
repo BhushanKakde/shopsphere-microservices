@@ -1,0 +1,5 @@
+package com.shopsphere.frontend.config;
+
+public class AppConfig {
+
+}

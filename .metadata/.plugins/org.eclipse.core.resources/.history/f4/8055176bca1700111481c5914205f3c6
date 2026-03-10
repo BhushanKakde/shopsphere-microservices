@@ -1,0 +1,39 @@
+package com.shopsphere.orderservice.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import com.shopsphere.orderservice.entity.Order;
+import com.shopsphere.orderservice.repository.OrderRepository;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/orders")
+@CrossOrigin("*")
+public class OrderController {
+
+    @Autowired
+    private OrderRepository orderRepository;
+
+    // ==========================
+    // PLACE ORDER
+    // ==========================
+    @PostMapping("/place/{userId}")
+    public Order placeOrder(@PathVariable Long userId,
+                            @RequestBody Order order) {
+
+        order.setUserId(userId);
+        order.setStatus("PLACED");
+
+        return orderRepository.save(order);
+    }
+
+    // ==========================
+    // GET USER ORDERS
+    // ==========================
+    @GetMapping("/user/{userId}")
+    public List<Order> getOrdersByUser(@PathVariable Long userId) {
+        return orderRepository.findByUserId(userId);
+    }
+}

@@ -1,0 +1,24 @@
+package com.shopsphere.orderservice.entity;
+
+import jakarta.persistence.*;
+
+@Entity
+@Table(name="order_items")
+public class OrderItem {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private Long orderId;
+
+    private String productName;
+
+    private double price;
+
+    private int quantity;
+
+    private String imageUrl;
+
+    // getters setters
+}

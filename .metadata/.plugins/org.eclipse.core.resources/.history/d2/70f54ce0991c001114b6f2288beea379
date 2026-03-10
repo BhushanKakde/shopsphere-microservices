@@ -1,0 +1,42 @@
+package com.shopsphere.productservice.controller;
+
+import com.shopsphere.productservice.entity.Product;
+import com.shopsphere.productservice.repository.ProductRepository;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+@CrossOrigin(origins = "*")
+
+@RestController
+@RequestMapping("/products")
+public class ProductController {
+
+    private final ProductRepository repo;
+
+    public ProductController(ProductRepository repo) {
+        this.repo = repo;
+    }
+
+    @GetMapping
+    public List<Product> getAllProducts() {
+        return repo.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public Product getProduct(@PathVariable Long id) {
+        return repo.findById(id).orElseThrow();
+    }
+
+    @GetMapping("/search")
+    public List<Product> search(@RequestParam String keyword) {
+        return repo.findByNameContainingIgnoreCase(keyword);
+    }
+
+    @GetMapping("/category/{category}")
+    public List<Product> byCategory(@PathVariable String category) {
+        return repo.findByCategory(category);
+    }
+    
+    
+    
+}

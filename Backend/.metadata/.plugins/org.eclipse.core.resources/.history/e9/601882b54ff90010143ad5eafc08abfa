@@ -1,0 +1,5 @@
+package com.shopsphere.productservice.entity;
+
+public class Product {
+
+}

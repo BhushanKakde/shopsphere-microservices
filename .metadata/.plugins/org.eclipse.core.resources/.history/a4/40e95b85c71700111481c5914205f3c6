@@ -1,0 +1,59 @@
+<%@ page contentType="text/html;charset=UTF-8" %>
+<!DOCTYPE html>
+<html>
+<head>
+<title>My Orders</title>
+</head>
+
+<body>
+
+<h2>My Orders</h2>
+
+<div id="orders"></div>
+
+<script>
+
+const userId = "<%= session.getAttribute("userId") %>";
+
+fetch("http://localhost:8084/orders/user/" + userId)
+.then(res => res.json())
+.then(orders => {
+
+    const container = document.getElementById("orders");
+    container.innerHTML = "";
+
+    if (!orders || orders.length === 0) {
+        container.innerHTML = "No orders yet.";
+        return;
+    }
+
+    orders.forEach(order => {
+
+        container.innerHTML += `
+        <div style="border:1px solid #ccc; padding:15px; margin-bottom:15px;">
+
+            <p><b>Order ID:</b> ${order.id}</p>
+
+            <p><b>Name:</b> ${order.fullName}</p>
+
+            <p><b>City:</b> ${order.city}</p>
+
+            <p><b>Status:</b> ${order.status}</p>
+
+            <p><b>Total:</b> ₹${order.totalAmount}</p>
+
+        </div>
+        `;
+
+    });
+
+})
+.catch(err => {
+    console.error(err);
+    document.getElementById("orders").innerHTML = "Failed to load orders.";
+});
+
+</script>
+
+</body>
+</html>

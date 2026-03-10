@@ -1,0 +1,60 @@
+<%@ page contentType="text/html;charset=UTF-8" %>
+<!DOCTYPE html>
+<html>
+<head>
+<title>My Orders</title>
+</head>
+
+<body>
+
+<h2>My Orders</h2>
+
+<div id="orders"></div>
+
+<script>
+
+const userId = "<%= session.getAttribute("userId") %>";
+
+console.log("UserId:", userId);
+
+fetch("http://localhost:8084/orders/user/" + userId)
+.then(response => response.json())
+.then(data => {
+
+    console.log("Orders:", data);
+
+    const container = document.getElementById("orders");
+
+    if(!data || data.length === 0){
+        container.innerHTML = "No orders yet.";
+        return;
+    }
+
+    data.forEach(order => {
+
+        const card = document.createElement("div");
+        card.style.border="1px solid #ccc";
+        card.style.padding="15px";
+        card.style.marginBottom="20px";
+
+        card.innerHTML =
+        "<p><b>Order ID:</b> "+order.id+"</p>" +
+        "<p><b>Name:</b> "+order.fullName+"</p>" +
+        "<p><b>City:</b> "+order.city+"</p>" +
+        "<p><b>Status:</b> "+order.status+"</p>" +
+        "<p><b>Total:</b> ₹"+order.totalAmount+"</p>";
+
+        container.appendChild(card);
+
+    });
+
+})
+.catch(err=>{
+    console.log(err);
+    document.getElementById("orders").innerHTML="Failed to load orders.";
+});
+
+</script>
+
+</body>
+</html>

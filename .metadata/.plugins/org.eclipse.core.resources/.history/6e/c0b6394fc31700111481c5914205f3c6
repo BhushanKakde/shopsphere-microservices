@@ -1,0 +1,22 @@
+package com.shopsphere.orderservice.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import com.shopsphere.orderservice.entity.Order;
+import com.shopsphere.orderservice.service.OrderService;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/orders")
+public class OrderController {
+
+    @Autowired
+    private OrderService orderService;
+
+    @GetMapping("/user/{userId}")
+    public List<Order> getOrdersByUser(@PathVariable Long userId) {
+        return orderService.getOrdersByUser(userId);
+    }
+}

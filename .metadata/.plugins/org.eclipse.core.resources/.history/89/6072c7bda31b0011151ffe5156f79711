@@ -1,0 +1,124 @@
+package com.shopsphere.frontend.controller;
+
+import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.Map;
+
+@Controller
+@RequestMapping("/admin")
+public class AdminController {
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+
+    // ==========================
+    // ADMIN LOGIN PAGE
+    // ==========================
+    @GetMapping
+    public String adminLoginPage(HttpSession session){
+
+        String admin = (String) session.getAttribute("admin");
+
+        if(admin != null){
+            return "redirect:/admin/dashboard";
+        }
+
+        return "admin-login";
+    }
+
+
+    // ==========================
+    // ADMIN LOGIN PROCESS
+    // ==========================
+    @PostMapping("/login")
+    public String adminLogin(@RequestParam String email,
+                             @RequestParam String password,
+                             HttpSession session){
+
+        try{
+
+            Map<String,String> body = Map.of(
+                    "email",email,
+                    "password",password
+            );
+
+            Map user = restTemplate.postForObject(
+                    "http://localhost:8081/users/login",
+                    body,
+                    Map.class
+            );
+
+            if(user != null && "ADMIN".equals(user.get("role"))){
+
+                session.setAttribute("admin","true");
+
+                return "redirect:/admin/dashboard";
+            }
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+        return "admin-login";
+    }
+
+
+    // ==========================
+    // ADMIN DASHBOARD
+    // ==========================
+    @GetMapping("/dashboard")
+    public String dashboard(HttpSession session){
+
+        if(session.getAttribute("admin") == null){
+            return "redirect:/admin";
+        }
+
+        return "admin";
+    }
+
+
+    // ==========================
+    // ADMIN PRODUCTS
+    // ==========================
+    @GetMapping("/products")
+    public String manageProducts(HttpSession session){
+
+        if(session.getAttribute("admin") == null){
+            return "redirect:/admin";
+        }
+
+        return "admin-products";
+    }
+
+
+    // ==========================
+    // ADMIN ORDERS
+    // ==========================
+    @GetMapping("/orders")
+    public String manageOrders(HttpSession session){
+
+        if(session.getAttribute("admin") == null){
+            return "redirect:/admin";
+        }
+
+        return "admin-orders";
+    }
+
+
+    // ==========================
+    // ADMIN LOGOUT
+    // ==========================
+    @GetMapping("/logout")
+    public String logout(HttpSession session){
+
+        session.invalidate();
+
+        return "redirect:/admin";
+    }
+
+}

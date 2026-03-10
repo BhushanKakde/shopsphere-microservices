@@ -1,0 +1,66 @@
+package com.shopsphere.userservice.controller;
+
+import com.shopsphere.userservice.dto.LoginRequest;
+import com.shopsphere.userservice.dto.RegisterRequest;
+import com.shopsphere.userservice.entity.User;
+import com.shopsphere.userservice.repository.UserRepository;
+
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+@CrossOrigin(origins = "*")
+
+@RestController
+@RequestMapping("/user")
+public class AuthController {
+
+    private final UserRepository userRepository;
+
+    public AuthController(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    // =====================
+    // REGISTER
+    // =====================
+    @PostMapping("/register")
+    public String register(@RequestBody RegisterRequest request) {
+
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            return "USER_ALREADY_EXISTS";
+        }
+
+        User user = new User();
+        user.setName(request.getName());
+        user.setEmail(request.getEmail());
+        user.setPassword(request.getPassword());
+
+        userRepository.save(user);
+
+        return "REGISTER_SUCCESS";
+    }
+
+    // =====================
+    // LOGIN
+    // =====================
+    @PostMapping("/login")
+    public User login(@RequestBody LoginRequest request) {
+
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("INVALID_CREDENTIALS"));
+
+        if (!user.getPassword().equals(request.getPassword())) {
+            throw new RuntimeException("INVALID_CREDENTIALS");
+        }
+
+        return user;
+    }
+
+    // =====================
+    // GET ALL USERS (ADMIN DASHBOARD)
+    // =====================
+    @GetMapping("/all")
+    public List<User> getAllUsers(){
+        return userRepository.findAll();
+    }
+}

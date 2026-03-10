@@ -1,0 +1,5 @@
+package com.shopsphere.orderservice.repository;
+
+public class OrderItemRepository {
+
+}

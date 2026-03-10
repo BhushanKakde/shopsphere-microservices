@@ -1,0 +1,396 @@
+<%@ page contentType="text/html;charset=UTF-8" %>
+
+<!DOCTYPE html>
+
+<html>
+<head>
+<title>ShopSphere | Admin Products</title>
+
+<style>
+
+body{
+margin:0;
+font-family:Arial, Helvetica, sans-serif;
+background:#f1f3f6;
+}
+
+/* HEADER */
+
+.header{
+background:#2874f0;
+color:white;
+padding:15px 30px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.logo{
+font-size:24px;
+font-weight:bold;
+}
+
+.user-info{
+display:flex;
+align-items:center;
+gap:15px;
+}
+
+.logout-btn{
+background:white;
+color:#2874f0;
+border:none;
+padding:8px 14px;
+border-radius:4px;
+cursor:pointer;
+font-weight:bold;
+}
+
+/* PAGE TITLE */
+
+.title{
+padding:20px 30px;
+background:white;
+}
+
+.title h2{
+margin:0;
+color:#2874f0;
+}
+
+/* CONTENT */
+
+.container{
+padding:30px;
+}
+
+/* ADD BUTTON */
+
+.add-btn{
+background:#00a65a;
+color:white;
+border:none;
+padding:10px 15px;
+border-radius:5px;
+cursor:pointer;
+margin-bottom:20px;
+font-weight:bold;
+}
+
+.add-btn:hover{
+background:#008d4c;
+}
+
+/* TABLE */
+
+table{
+width:100%;
+background:white;
+border-collapse:collapse;
+box-shadow:0 2px 8px rgba(0,0,0,0.15);
+}
+
+th,td{
+padding:12px;
+border-bottom:1px solid #ddd;
+text-align:center;
+}
+
+th{
+background:#2874f0;
+color:white;
+}
+
+img{
+width:60px;
+border-radius:4px;
+}
+
+/* BUTTONS */
+
+.edit-btn{
+background:#ff9f00;
+color:white;
+border:none;
+padding:6px 10px;
+border-radius:4px;
+cursor:pointer;
+}
+
+.delete-btn{
+background:#e74c3c;
+color:white;
+border:none;
+padding:6px 10px;
+border-radius:4px;
+cursor:pointer;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+
+<div class="logo">🛒 ShopSphere Admin</div>
+
+<div class="user-info">
+
+<a href="/" class="edit-btn">🏠 Home</a>
+
+<form action="/logout" method="get">
+<button class="logout-btn">Logout</button>
+</form>
+
+</div>
+
+</div>
+
+<div class="title">
+<h2>📦 Manage Products</h2>
+</div>
+
+<div class="container">
+
+<button class="add-btn" onclick="showAddForm()">➕ Add Product</button>
+
+<table>
+
+<thead>
+
+<tr>
+<th>ID</th>
+<th>Image</th>
+<th>Name</th>
+<th>Description</th>
+<th>Price</th>
+<th>Edit</th>
+<th>Delete</th>
+</tr>
+
+</thead>
+
+<tbody id="productTable"></tbody>
+
+</table>
+
+</div>
+
+<script>
+
+const PRODUCT_API = "http://localhost:8082/products";
+
+/* LOAD PRODUCTS */
+
+loadProducts();
+
+function loadProducts(){
+
+fetch(PRODUCT_API)
+
+.then(res => res.json())
+
+.then(data => {
+
+const table = document.getElementById("productTable");
+
+table.innerHTML = "";
+
+data.forEach(p => {
+
+table.innerHTML += `
+
+<tr>
+
+<td>${p.id}</td>
+
+<td>
+<img src="${p.imageUrl}"
+onerror="this.src='https://cdn-icons-png.flaticon.com/512/1046/1046784.png'">
+</td>
+
+<td>${p.name}</td>
+
+<td>${p.description}</td>
+
+<td>₹${p.price}</td>
+
+<td>
+<button class="edit-btn"
+onclick="editProduct(${p.id})">
+Edit
+</button>
+</td>
+
+<td>
+<button class="delete-btn"
+onclick="deleteProduct(${p.id})">
+Delete
+</button>
+</td>
+
+</tr>
+
+`;
+
+});
+
+})
+
+.catch(err => {
+console.log(err);
+alert("Error loading products");
+});
+
+}
+
+
+
+/* DELETE PRODUCT */
+
+function deleteProduct(id){
+
+if(!confirm("Delete this product?")) return;
+
+fetch(PRODUCT_API + "/" + id,{
+method:"DELETE"
+})
+
+.then(res => {
+
+if(!res.ok){
+throw new Error("Delete failed");
+}
+
+alert("Product deleted");
+
+loadProducts();
+
+})
+
+.catch(err => {
+
+console.log(err);
+
+alert("Delete failed");
+
+});
+
+}
+
+
+
+/* ADD PRODUCT */
+
+function showAddForm(){
+
+const name = prompt("Product Name");
+
+const description = prompt("Description");
+
+const price = prompt("Price");
+
+const imageUrl = prompt("Image URL");
+
+fetch(PRODUCT_API,{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+
+name:name,
+description:description,
+price:price,
+imageUrl:imageUrl
+
+})
+
+})
+
+.then(res => {
+
+if(!res.ok){
+throw new Error("Add failed");
+}
+
+alert("Product added successfully");
+
+loadProducts();
+
+})
+
+.catch(err => {
+
+console.log(err);
+
+alert("Error adding product");
+
+});
+
+}
+
+
+
+/* EDIT PRODUCT */
+
+function editProduct(id){
+
+const name = prompt("New Product Name");
+
+const description = prompt("New Description");
+
+const price = prompt("New Price");
+
+const imageUrl = prompt("New Image URL");
+
+fetch(PRODUCT_API + "/" + id,{
+
+method:"PUT",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+
+name:name,
+description:description,
+price:price,
+imageUrl:imageUrl
+
+})
+
+})
+
+.then(res => {
+
+if(!res.ok){
+throw new Error("Update failed");
+}
+
+alert("Product updated");
+
+loadProducts();
+
+})
+
+.catch(err => {
+
+console.log(err);
+
+alert("Update failed");
+
+});
+
+}
+
+</script>
+
+</body>
+</html>

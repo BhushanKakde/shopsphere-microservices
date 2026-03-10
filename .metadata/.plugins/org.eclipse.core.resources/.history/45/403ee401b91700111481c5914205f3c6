@@ -1,0 +1,76 @@
+package com.shopsphere.frontend.controller;
+
+import jakarta.servlet.http.HttpSession;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+
+@Controller
+public class PageController {
+
+    // =====================
+    // LOGIN PAGE
+    // =====================
+    @GetMapping("/login")
+    public String loginPage() {
+        return "login";
+    }
+
+    // =====================
+    // REGISTER PAGE
+    // =====================
+    @GetMapping("/register")
+    public String registerPage() {
+        return "register";
+    }
+
+    // =====================
+    // HOME PAGE
+    // =====================
+    @GetMapping({"/", "/home"})
+    public String home(HttpSession session, Model model) {
+
+        Long userId = (Long) session.getAttribute("userId");
+        String username = (String) session.getAttribute("username");
+
+        if (userId == null || username == null) {
+            return "redirect:/login";
+        }
+
+        model.addAttribute("userId", userId);
+        model.addAttribute("username", username);
+
+        return "home";
+    }
+
+    // =====================
+    // CART PAGE
+    // =====================
+    @GetMapping("/cart")
+    public String cart() {
+        return "cart";
+    }
+
+    // =====================
+    // CHECKOUT PAGE
+    // =====================
+    @GetMapping("/checkout")
+    public String checkout(HttpSession session) {
+
+        Long userId = (Long) session.getAttribute("userId");
+
+        if (userId == null) {
+            return "redirect:/login";
+        }
+
+        return "checkout";
+    }
+
+    // =====================
+    // ORDER HISTORY
+    // =====================
+    @GetMapping("/orders")
+    public String orderHistory() {
+        return "order-history";
+    }
+}

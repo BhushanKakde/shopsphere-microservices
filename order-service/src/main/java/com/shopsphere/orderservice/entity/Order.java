@@ -1,0 +1,117 @@
+package com.shopsphere.orderservice.entity;
+
+import jakarta.persistence.*;
+import java.util.List;
+
+@Entity
+@Table(name = "orders")
+public class Order {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private Long userId;
+
+    private String fullName;
+    private String phone;
+    private String address;
+    private String city;
+    private String pincode;
+    private String paymentMethod;
+
+    private String status;
+
+    private double totalAmount;
+
+    // 🔴 ADD THIS PART
+    @OneToMany
+    @JoinColumn(name = "orderId")
+    private List<OrderItem> items;
+
+    // ===== GETTERS & SETTERS =====
+
+    public Long getId() {
+        return id;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getPincode() {
+        return pincode;
+    }
+
+    public void setPincode(String pincode) {
+        this.pincode = pincode;
+    }
+
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public double getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(double totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+
+    public List<OrderItem> getItems() {
+        return items;
+    }
+
+    public void setItems(List<OrderItem> items) {
+        this.items = items;
+    }
+}
