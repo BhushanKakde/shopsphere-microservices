@@ -72,20 +72,19 @@ http://localhost:9090
 
 ## 📸 Screenshots
 
+## Screenshots
+
 ### Home Page
-![Home](home_page.png)
-
-### Admin Dashboard
-![Admin](admin dash.png)
-
-### Product Add Page
-![Product](product add.png)
+![Home Page](home_page.png)
 
 ### Cart Page
-![Cart](cartpage.png)
+![Cart Page](cartpage.png)
+
+### Admin Dashboard
+![Admin Dashboard](admin_dash.png)
 
 ### Order History
-![Order](bill order history.png)
+![Order History](bill_history.png)
 
 ---
 
