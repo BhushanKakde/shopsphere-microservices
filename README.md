@@ -34,13 +34,17 @@ It demonstrates a distributed architecture with separate services for users, pro
 
 The system consists of multiple services:
 
-- **Eureka Server** → Service discovery
-- **API Gateway** → Central entry point
-- **User Service** → User management
-- **Product Service** → Product catalog
-- **Cart Service** → Shopping cart
-- **Order Service** → Order processing
-- **Frontend App** → User interface
+## 🏗 Microservices Architecture
+
+The system consists of multiple services:
+
+- **Eureka Server (Port: 8761)** → Service discovery for all microservices
+- **API Gateway (Port: 8080)** → Central entry point for routing requests
+- **User Service (Port: 8081)** → Handles user registration and login
+- **Product Service (Port: 8082)** → Manages product catalog and product APIs
+- **Cart Service (Port: 8083)** → Handles shopping cart operations
+- **Order Service (Port: 8084)** → Processes orders and order history
+- **Frontend App (Port: 9090)** → Web interface for users and admin
 
 ---
 
